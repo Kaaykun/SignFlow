@@ -1,7 +1,7 @@
 from sklearn.preprocessing import LabelEncoder
 import tensorflow as tf
 
-from params import N_CLASSES
+from backend.params import N_CLASSES
 
 
 def categorize_y(selected_df, input_length):

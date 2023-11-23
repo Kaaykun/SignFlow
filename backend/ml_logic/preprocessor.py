@@ -1,7 +1,7 @@
 import numpy as np
 import cv2
 
-from params import FRAMES_PER_VIDEO, TARGET_SIZE, VIDEO_PATH
+from backend.params import FRAMES_PER_VIDEO, TARGET_SIZE, VIDEO_PATH
 
 
 def sample_frames(video_path, total_frames):

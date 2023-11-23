@@ -2,25 +2,7 @@ import streamlit as st
 import cv2
 import numpy as np
 
-# Load your pre-existing model
-# model = load_model()
 
-# video preprocessing
-# def process_video(video_file):
-#     # Replace the following lines with code to process the video using your model
-#     cap = cv2.VideoCapture(video_file.name)
-#     frames = []
-#     while True:
-#         ret, frame = cap.read()
-#         if not ret:
-#             break
-#         # Perform processing on the frame using your model
-#         # processed_frame = model.predict(frame)
-#         frames.append(frame)
-#     cap.release()
-#     return frames
-
-# Initialize empty array of desired shape
 X = np.empty((1, 10, *(150, 150), 3), dtype=np.uint8)
 
 # Function to perform frame sampling

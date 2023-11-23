@@ -3,7 +3,7 @@ import shutil
 import sys
 import os
 
-from params import FRAMES_PER_VIDEO, TARGET_SIZE, TRAIN_SIZE, N_CLASSES, NUMBER_OF_AUGMENTATIONS
+from backend.params import FRAMES_PER_VIDEO, TARGET_SIZE, TRAIN_SIZE, N_CLASSES, NUMBER_OF_AUGMENTATIONS
 
 
 def generate_processed_videos(X):

@@ -2,7 +2,7 @@ import pandas as pd
 import cv2
 import os
 
-from params import MAIN_PATH, SELECTED_WORDS
+from backend.params import MAIN_PATH, SELECTED_WORDS
 
 
 def get_videos_ids(json_list):

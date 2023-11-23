@@ -1,7 +1,7 @@
 import numpy as np
 import cv2
 
-from backend.params import *
+from params import TARGET_SIZE, FRAMES_PER_VIDEO, NUMBER_OF_AUGMENTATIONS
 
 
 def augment_frame_params(frame_width, frame_height):

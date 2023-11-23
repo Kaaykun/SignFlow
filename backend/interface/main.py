@@ -4,12 +4,12 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 from sklearn.model_selection import train_test_split
 
-from backend.params import *
-from backend.ml_logic.data import load_wlas_df, load_features_df, load_selected_df
-from backend.ml_logic.preprocessor import create_X
-from backend.ml_logic.encoders import categorize_y
-from backend.ml_logic.augment import augment_data
-from backend.ml_logic.registry import test_shape_X_y, test_shape_X_y_val, test_shape_X_y_aug
+from params import TRAIN_SIZE
+from ml_logic.data import load_wlas_df, load_features_df, load_selected_df
+from ml_logic.preprocessor import create_X
+from ml_logic.encoders import categorize_y
+from ml_logic.augment import augment_data
+from ml_logic.registry import test_shape_X_y, test_shape_X_y_val, test_shape_X_y_aug
 
 
 def main():

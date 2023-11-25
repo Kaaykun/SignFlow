@@ -1,3 +1,7 @@
+import os
+# Suppress WARNING, INFO, and DEBUG messages related to tensorflow
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+
 import numpy as np
 import cv2
 

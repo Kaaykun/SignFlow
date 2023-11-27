@@ -5,7 +5,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import numpy as np
 import cv2
 
-from backend.params import FRAMES_PER_VIDEO, TARGET_SIZE, VIDEO_PATH
+from backend.params import FRAMES_PER_VIDEO, TARGET_SIZE, VIDEO_PATH, CUSTOM_VIDEO_PATH
 
 
 def sample_frames(video_path, total_frames):
@@ -72,6 +72,34 @@ def create_X(selected_df, input_length):
         video_id = row['video_id']
         total_frames = row['video_length']
         video_path = f'{VIDEO_PATH}{video_id}.mp4'
+
+        sampled_frames = sample_frames(video_path, total_frames)
+
+        X[i] = np.array(sampled_frames)
+
+    return X
+
+
+def create_custom_X(selected_df, input_length):
+    """
+    Create an array X for sampled frames from selected videos.
+
+    Parameters:
+    - selected_df (pandas.DataFrame): DataFrame containing selected video information.
+    - input_length (int): Length of the selected DataFrame.
+
+    Returns:
+    - numpy.ndarray: An array containing sampled frames from selected videos.
+    """
+
+    np.random.seed(9)
+
+    X = np.empty((input_length, FRAMES_PER_VIDEO, *TARGET_SIZE, 3), dtype=np.uint8)
+
+    for i, row in selected_df.iterrows():
+        video_id = row['video_id']
+        total_frames = row['video_length']
+        video_path = f'{CUSTOM_VIDEO_PATH}{video_id}.mp4'
 
         sampled_frames = sample_frames(video_path, total_frames)
 

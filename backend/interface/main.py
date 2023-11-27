@@ -5,21 +5,26 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 from sklearn.model_selection import train_test_split
 
 from backend.params import TRAIN_SIZE
-from backend.ml_logic.data import load_wlas_df, load_features_df, load_selected_df
-from backend.ml_logic.preprocessor import create_X
+from backend.ml_logic.data import load_wlas_df, load_features_df, load_selected_df, load_custom_features_df, load_custom_selected_df
+from backend.ml_logic.preprocessor import create_X, create_custom_X
 from backend.ml_logic.encoders import categorize_y
 from backend.ml_logic.augment import augment_data
 from backend.ml_logic.registry import test_shape_X_y, test_shape_X_y_val, test_shape_X_y_aug, save_model
 from backend.ml_logic.model import mediapipe_video_to_coord, train_model
 
 def main():
-    # Load dataframes from backend.ml_logic.data
-    wlas_df = load_wlas_df()
-    features_df = load_features_df(wlas_df)
-    selected_df, input_length = load_selected_df(features_df)
+    # Load dataframes from backend.ml_logic.data (when using original videos)
+    #wlas_df = load_wlas_df()
+    #features_df = load_features_df(wlas_df)
+    #selected_df, input_length = load_selected_df(features_df)
+
+    # Load dataframes from backend.ml_logic.data (when using custom videos)
+    features_df = load_custom_features_df()
+    selected_df, input_length = load_custom_selected_df(features_df)
 
     # Create feature matrix X and categorical labels y_cat
-    X = create_X(selected_df, input_length)
+    #X = create_X(selected_df, input_length)
+    X = create_custom_X(selected_df, input_length)
     y_cat = categorize_y(selected_df)
 
     # Check for correct shapes of X, y_cat
@@ -44,7 +49,7 @@ def main():
     # Convert augmented and validation data to coordinates
     X_aug_coord = mediapipe_video_to_coord(X_aug)
     X_val_coord = mediapipe_video_to_coord(X_val)
-    
+
     # Train the model using coordinates
     model = train_model(X_aug_coord, X_val_coord, y_aug, y_cat_val)
 

@@ -162,7 +162,7 @@ def load_model():
     return latest_model
 
 
-def record_videos(word, video_duration, num_videos):
+def record_videos(word, name, video_duration, num_videos):
     """
     Record multiple videos using the default camera for a specified duration.
 
@@ -181,7 +181,7 @@ def record_videos(word, video_duration, num_videos):
         os.makedirs(output_folder)
 
     for video_num in range(1, num_videos + 1):
-        output_file = f"{word}_{video_num}.mp4"
+        output_file = f"{word}_{name}_{video_num}.mp4"
 
         # Open a video capture stream (use 0 for default camera)
         cap = cv2.VideoCapture(0)

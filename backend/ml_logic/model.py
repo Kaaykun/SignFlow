@@ -10,7 +10,7 @@ from keras import Sequential, layers
 from keras.optimizers import Adam
 from keras.callbacks import EarlyStopping
 
-from backend.params import FRAMES_PER_VIDEO
+from backend.params import FRAMES_PER_VIDEO, N_CLASSES
 
 
 def detect_landmarks(frame):
@@ -275,21 +275,18 @@ def train_model(X_aug_coord, X_val_coord, y_aug, y_cat_val):
     Returns:
     - tf.keras.Model: Trained LSTM model.
     """
-    learning_rate = 1e-4
-    dim = 201
-    epochs=300,
-    batch_size=16
-
     def model_initialize_simple(dim):
         model = Sequential()
         model.add(layers.Masking(input_shape=(FRAMES_PER_VIDEO, dim), mask_value=0))
         model.add(layers.LSTM(units=256, activation="tanh", return_sequences=True))
         model.add(layers.LSTM(units=128, activation="tanh"))
-        model.add(layers.Dense(6, activation="softmax"))
+        model.add(layers.Dense(N_CLASSES, activation="softmax"))
 
         return model
 
     def model_compile(model):
+        learning_rate = 1e-4
+
         model.compile(
             loss="categorical_crossentropy",
             optimizer=Adam(learning_rate=learning_rate),
@@ -298,13 +295,13 @@ def train_model(X_aug_coord, X_val_coord, y_aug, y_cat_val):
 
         return model
 
-    def model_fit(model, epochs, batch_size):
+    def model_fit(model, epoch, batch_size):
         es = EarlyStopping(patience=100, restore_best_weights=True)
 
         history = model.fit(
             X_aug_coord,
             y_aug,
-            epochs=epochs,
+            epochs=epoch,
             batch_size=batch_size,
             validation_data=(X_val_coord, y_cat_val),
             verbose=1,
@@ -313,8 +310,10 @@ def train_model(X_aug_coord, X_val_coord, y_aug, y_cat_val):
 
         return model
 
+    dim = 201
+
     model = model_initialize_simple(dim)
     model = model_compile(model)
-    model = model_fit(model, epochs, batch_size)
+    model = model_fit(model, 300, 16)
 
     return model

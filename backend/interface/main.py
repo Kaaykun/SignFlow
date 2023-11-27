@@ -44,7 +44,7 @@ def main():
     # Convert augmented and validation data to coordinates
     X_aug_coord = mediapipe_video_to_coord(X_aug)
     X_val_coord = mediapipe_video_to_coord(X_val)
-
+    
     # Train the model using coordinates
     model = train_model(X_aug_coord, X_val_coord, y_aug, y_cat_val)
 

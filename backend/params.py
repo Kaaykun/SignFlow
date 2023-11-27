@@ -2,7 +2,7 @@ import os
 
 ##################  VARIABLES  ##################
 # Class definition
-SELECTED_WORDS = ['work','study', 'write', 'hot', 'cold', 'family']
+SELECTED_WORDS = ['work', 'study', 'write', 'hot', 'cold', 'family']
 N_CLASSES = len(SELECTED_WORDS)
 # Frame sampling parameters
 FRAMES_PER_VIDEO = 20

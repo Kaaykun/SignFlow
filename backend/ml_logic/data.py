@@ -6,7 +6,7 @@ import pandas as pd
 import cv2
 import os
 
-from backend.params import MAIN_PATH, SELECTED_WORDS
+from backend.params import MAIN_PATH, SELECTED_WORDS, CUSTOM_VIDEO_PATH
 
 
 def get_videos_ids(json_list):
@@ -83,6 +83,25 @@ def load_features_df(wlas_df):
     return features_df
 
 
+def load_custom_features_df():
+    """
+    Load videos from a data folder and generate a DataFrame with word and video ID.
+
+    Returns:
+    - pandas.DataFrame: A new DataFrame containing word and video ID columns.
+    """
+    features_df = pd.DataFrame(columns=['word', 'video_id'])
+
+    for filename in os.listdir(CUSTOM_VIDEO_PATH):
+        word = filename.split('_')[0]
+        filename = filename.replace('.mp4', '')
+        df = pd.DataFrame([[word, filename]], columns=features_df.columns)
+        # Append temporary df to feature_df
+        features_df = pd.concat([features_df, df], ignore_index=True)
+
+    return features_df
+
+
 def load_selected_df(features_df):
     """
     Load selected data from a features DataFrame and compute video lengths.
@@ -100,6 +119,32 @@ def load_selected_df(features_df):
     for video_id in selected_df['video_id']:
         if os.path.exists(f'{MAIN_PATH}videos/{video_id}.mp4'):
             cap = cv2.VideoCapture(f'{MAIN_PATH}videos/{video_id}.mp4')
+            length = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+            selected_df.loc[selected_df['video_id'] == video_id, ['video_length']] = int(length)
+        pass
+
+    selected_df = selected_df.reset_index(drop=True)
+    input_length = len(selected_df)
+    return selected_df, input_length
+
+
+def load_custom_selected_df(features_df):
+    """
+    Load selected data from a features DataFrame and compute video lengths.
+
+    Parameters:
+    - features_df (pandas.DataFrame): DataFrame containing features information.
+
+    Returns:
+    - tuple: A tuple containing two elements:
+        1. pandas.DataFrame: Selected DataFrame with updated video length information.
+        2. int: Length of the selected DataFrame.
+    """
+    selected_df = features_df[features_df['word'].isin(SELECTED_WORDS)]
+
+    for video_id in selected_df['video_id']:
+        if os.path.exists(f'{CUSTOM_VIDEO_PATH}{video_id}.mp4'):
+            cap = cv2.VideoCapture(f'{CUSTOM_VIDEO_PATH}{video_id}.mp4')
             length = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
             selected_df.loc[selected_df['video_id'] == video_id, ['video_length']] = int(length)
         pass

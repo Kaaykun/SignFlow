@@ -296,7 +296,7 @@ def train_model(X_aug_coord, X_val_coord, y_aug, y_cat_val):
         return model
 
     def model_fit(model, epoch, batch_size):
-        es = EarlyStopping(patience=100, restore_best_weights=True)
+        es = EarlyStopping(patience=10, restore_best_weights=True)
 
         history = model.fit(
             X_aug_coord,
@@ -310,10 +310,13 @@ def train_model(X_aug_coord, X_val_coord, y_aug, y_cat_val):
 
         return model
 
+    # 21 Landmarks per hand (42)
+    # 25 Landmarks per pose
+    # dim = (42 + 25) * 3 (X, Y, Z coords)
     dim = 201
 
     model = model_initialize_simple(dim)
     model = model_compile(model)
-    model = model_fit(model, 300, 16)
+    model = model_fit(model, epoch=300, batch_size=16)
 
     return model

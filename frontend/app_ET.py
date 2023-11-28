@@ -13,11 +13,9 @@ import time
 from backend.ml_logic.model import mediapipe_video_to_coord, detect_landmarks
 from backend.ml_logic.preprocessor import sample_frames
 from backend.ml_logic.registry import load_model, draw_landmarks
-
 from backend.params import VIDEO_PATH
 
-mp_holistic = mp.solutions.holistic
-model = load_model()
+# model = load_model()
 
 
 
@@ -26,31 +24,33 @@ frame_accumulator = []
 # prediction_list = [""]
 
 mapping = {'bye': 2,
- 'love': 6,
- 'many': 7,
- 'world': 12,
- 'thankyou': 9,
- 'work': 11,
- 'hello': 5,
- 'go': 4,
- 'yes': 13,
- 'you': 14,
- 'beer': 1,
- 'I': 0,
- 'drink': 3,
- 'what': 10,
- 'no': 8}
+            'love': 6,
+            'many': 7,
+            'world': 12,
+            'thankyou': 9,
+            'work': 11,
+            'hello': 5,
+            'go': 4,
+            'yes': 13,
+            'you': 14,
+            'beer': 1,
+            'I': 0,
+            'drink': 3,
+            'what': 10,
+            'no': 8}
 mapping = {v: k for k, v in mapping.items()}
 
 result_queue: "queue.Queue[List[Detection]]" = queue.Queue()
 second_queue: "queue.Queue[List[Detection]]" = queue.Queue()
+
 
 def frames_to_predicton(frames):
     frames_resized = [cv2.resize(frame, (480, 480)) for frame in frames]
     frames_resized = np.array(frames_resized)
     frames_resized = np.expand_dims(frames_resized, axis=0)
     X_coord = mediapipe_video_to_coord(frames_resized)
-    prediction = model.predict(X_coord)[0]
+    # prediction = model.predict(X_coord)[0]
+    prediction = st.session_state.model.predict(X_coord)[0]
     if np.max(prediction) > 0.4:
         max_index = np.argmax(prediction)
         word_detected = mapping[max_index]
@@ -63,7 +63,6 @@ def frames_to_predicton(frames):
     # print(max_index)
     print(word_detected)
     return word_detected
-
 
 
 def video_frame_callback(frame):
@@ -101,16 +100,18 @@ def video_frame_callback(frame):
     return av.VideoFrame.from_ndarray(annotated_image, format="bgr24")
 
 
-def video_streaming_page():
-    st.title("Live Sign Detection")
-
-
+# def video_streaming_page():
+#     st.title("Live Sign Detection")
 ##########################
 
 
 
 def main():
     st.sidebar.title("Pages")
+
+    if 'model' not in st.session_state:
+        st.session_state.model = load_model()
+        # st.write("MODEL LOADING")
 
     ctx = webrtc_streamer(key="example", video_frame_callback=video_frame_callback)
 
@@ -129,10 +130,11 @@ def main():
 
             # return recording frame %
             frame_count = (second_queue.get() + 1) * 100 / 20
-            frame_counter_placeholder.text(f"Recording... {frame_count: .0f}%")
+            frame_counter_placeholder.text(f"📽️ Recording... {frame_count: .0f}%")
 
             if frame_count == 100:
                 # return a string of predictions
+                frame_counter_placeholder.text("📽️ Recording... 100% → 🛠️ AI at work... 🦾")
                 result += result_queue.get() + " → "
                 prediction_placeholder.markdown(f"<h1>{result}</h1>", unsafe_allow_html=True)
 

@@ -1,6 +1,7 @@
 numpy==1.23.5
 opencv-python
 streamlit
+streamlit-webrtc
 mediapipe
 
 # Trick to install the version of Tensorflow depending on your processor: darwin == Mac, ARM == M1

@@ -39,21 +39,31 @@ pause:list[bool] = [False]  # Are we in a pause
 # lock = threading.Lock()
 # prediction_list = [""]
 
-mapping = {'bye': 2,
-            'love': 6,
-            'many': 7,
-            'world': 12,
-            'thankyou': 9,
-            'work': 11,
-            'hello': 5,
-            'go': 4,
-            'yes': 13,
-            'you': 14,
-            'beer': 1,
-            'I': 0,
-            'drink': 3,
-            'what': 10,
-            'no': 8}
+# mapping = {'bye': 2,
+#             'love': 6,
+#             'many': 7,
+#             'world': 12,
+#             'thankyou': 9,
+#             'work': 11,
+#             'hello': 5,
+#             'go': 4,
+#             'yes': 13,
+#             'you': 14,
+#             'beer': 1,
+#             'I': 0,
+#             'drink': 3,
+#             'what': 10,
+#             'no': 8}
+
+mapping = {'love': 5,
+        'world': 6,
+        'hello': 4,
+        'go': 3,
+        'you': 7,
+        'beer': 1,
+        'I': 0,
+        'drink': 2}
+
 mapping = {v: k for k, v in mapping.items()}
 
 result_queue: "queue.Queue[List[Detection]]" = queue.Queue()

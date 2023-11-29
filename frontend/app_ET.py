@@ -9,12 +9,14 @@ from streamlit_webrtc import webrtc_streamer
 import av
 import queue
 import time
+import asyncio
+import threading
 import sys
+
 root_path = os.path.join(
     os.path.dirname(__file__),
     "..",
 )
-
 sys.path.append(root_path)
 
 from backend.ml_logic.model import mediapipe_video_to_coord, detect_landmarks
@@ -22,9 +24,13 @@ from backend.ml_logic.preprocessor import sample_frames
 from backend.ml_logic.registry import load_model, draw_landmarks
 from backend.params import VIDEO_PATH
 
-
-
 model = load_model()
+
+# if 'model' not in st.session_state:
+#     st.session_state.model = load_model()
+#     print(type(st.session_state.model))
+#     # st.write("MODEL LOADING")
+
 
 frame_accumulator = []
 # lock = threading.Lock()
@@ -51,6 +57,8 @@ result_queue: "queue.Queue[List[Detection]]" = queue.Queue()
 second_queue: "queue.Queue[List[Detection]]" = queue.Queue()
 
 
+#################################
+
 def frames_to_predicton(frames):
     frames_resized = [cv2.resize(frame, (480, 480)) for frame in frames]
     frames_resized = np.array(frames_resized)
@@ -65,11 +73,11 @@ def frames_to_predicton(frames):
     else:
         word_detected = "..."
 
-    print(frames_resized.shape)
-    print(X_coord.shape)
-    print(prediction)
-    # print(max_index)
-    print(word_detected)
+    # print(frames_resized.shape)
+    # print(X_coord.shape)
+    # print(prediction)
+    # # print(max_index)
+    # print(word_detected)
     return word_detected
 
 
@@ -81,7 +89,7 @@ def video_frame_callback(frame):
     frame = frame.to_ndarray(format="bgr24")
     results = detect_landmarks(frame)
     annotated_image = draw_landmarks(results, frame)
-    print(frame.shape)
+    # print(frame.shape)
 
     # Accumulate 20 frames
     global frame_accumulator
@@ -91,6 +99,10 @@ def video_frame_callback(frame):
         end_time = time.time()
         elapsed_time = end_time - start_time
         # print(np.array(frame_accumulator).shape)
+
+        # # Start the frame processing in a separate thread
+        # processing_thread = threading.Thread(target=frames_to_predicton, args=frame_accumulator)
+        # processing_thread.start()
 
         word_detected = frames_to_predicton(frame_accumulator)
         # word_detected = "Prediction = " + word_detected + ", " + str(round(elapsed_time,3)) + "seconds"
@@ -121,12 +133,11 @@ def video_frame_callback(frame):
 def main():
     st.sidebar.title("Pages")
 
-    # if 'model' not in st.session_state:
-    #     st.session_state.model = load_model()
-    #     print(type(st.session_state.model))
-    #     # st.write("MODEL LOADING")
-
-    ctx = webrtc_streamer(key="example", video_frame_callback=video_frame_callback, async_processing=True)
+    ctx = webrtc_streamer(key="example",
+                          video_frame_callback=video_frame_callback,
+                        #   rtc_configuration={"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]},
+                          media_stream_constraints={"video": True, "audio": False},
+                          async_processing=True)
 
     if ctx.state.playing:
         # return recording frame %
@@ -148,7 +159,7 @@ def main():
             if frame_count == 100:
                 # return a string of predictions
                 frame_counter_placeholder.text("📽️ Recording Done!  🛠️ AI at work... 🦾")
-                result += result_queue.get() + " → "
+                result += result_queue.get() + " -> "
                 prediction_placeholder.markdown(f"<h1>{result}</h1>", unsafe_allow_html=True)
 
 
@@ -197,6 +208,9 @@ def main():
     # while ctx.state.playing:
     #     with lock:
     #         prediction = prediction_list[-1]
+
+
+###########################
 
 if __name__ == "__main__":
     main()

@@ -13,6 +13,8 @@ root_path = os.path.join(
 )
 sys.path.append(root_path)
 
+file_path = os.path.dirname(os.path.abspath(__file__))
+
 from backend.ml_logic.model import mediapipe_video_to_coord
 from backend.ml_logic.preprocessor import sample_frames
 from backend.ml_logic.registry import load_model
@@ -84,8 +86,9 @@ def video_uploading_page():
     model = load_model()
 
     st.title("Sign detection")
-    # banner_image = "./sign_banner.jpg"
-    # st.image(banner_image, use_column_width=True)
+    banner_image = os.path.join(file_path, 'sign_banner.jpg')
+    os.path.join(file_path, 'videos_demo' ,'05707.mp4' )
+    st.image(banner_image, use_column_width=True)
     st.markdown("""
     <div style="display: flex; justify-content: center; align-items: center;">
         <h2>Select a word and learn its sign!</h2>
@@ -94,7 +97,7 @@ def video_uploading_page():
 
     classes = ['Select a sign','beer','bye','drink','go','hello','love','many','no','thank you','what','work','world','yes','you']
     video_urls = {
-        'beer': ['./videos_demo/05707.mp4', './videos_demo/}05708.mp4'],
+        'beer': [os.path.join(file_path,'videos_demo','05707.mp4'), os.path.join(file_path,'videos_demo','05708.mp4')],
         'bye': ['./videos_demo/08512.mp4', './videos_demo/08517.mp4'],
         'drink': ['./videos_demo/69302.mp4', './videos_demo/65539.mp4'],
         'go': ['./videos_demo/24946.mp4', './videos_demo/24941.mp4'],

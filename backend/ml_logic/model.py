@@ -4,6 +4,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 import mediapipe as mp
 import cv2
+import time
 import tensorflow as tf
 from tensorflow import keras
 from keras import Sequential, layers
@@ -56,14 +57,14 @@ def get_coord_for_R_hand(results):
                 x_coord_R_hand.append(0)
                 y_coord_R_hand.append(0)
                 z_coord_R_hand.append(0)
-        print("✅ Right hand detected")
+        #print("✅ Right hand detected")
 
     else:
         for _ in range(FRAMES_PER_VIDEO + 1):
             x_coord_R_hand.append(0)
             y_coord_R_hand.append(0)
             z_coord_R_hand.append(0)
-        print("❌ Right hand not detected")
+        #print("❌ Right hand not detected")
 
     return x_coord_R_hand, y_coord_R_hand, z_coord_R_hand
 
@@ -93,13 +94,13 @@ def get_coord_for_L_hand(results):
                 x_coord_L_hand.append(0)
                 y_coord_L_hand.append(0)
                 z_coord_L_hand.append(0)
-        print("✅ Left hand detected")
+        #print("✅ Left hand detected")
     else:
         for _ in range(FRAMES_PER_VIDEO + 1):
             x_coord_L_hand.append(0)
             y_coord_L_hand.append(0)
             z_coord_L_hand.append(0)
-        print("❌ Left hand not detected")
+        #print("❌ Left hand not detected")
 
     return x_coord_L_hand, y_coord_L_hand, z_coord_L_hand
 
@@ -129,13 +130,13 @@ def get_coord_for_pose(results):
                 x_coord_pose.append(0)
                 y_coord_pose.append(0)
                 z_coord_pose.append(0)
-        print("✅ Pose detected")
+        #print("✅ Pose detected")
 
     else:
         x_coord_pose = [0] * 33
         y_coord_pose = [0] * 33
         z_coord_pose = [0] * 33
-        print("❌ Pose not detected")
+        #print("❌ Pose not detected")
 
     x_coord_pose = x_coord_pose[0:25]
     y_coord_pose = y_coord_pose[0:25]
@@ -251,14 +252,18 @@ def mediapipe_video_to_coord(X):
         video_frames = []
 
         for frame_count in range(FRAMES_PER_VIDEO):
+            # start = time.time()
             frame = video[frame_count]
             results = detect_landmarks(frame)
+            # print('Frame Count:', frame_count, 'Landmark:', time.time() - start)
+            # middle = time.time()
             X_frame = normalized_coordinates_per_frame(results)
+            # print('Normalize:', time.time() - middle)
             video_frames.append(X_frame)
 
         X_coord.append(video_frames)
-
     X_coord = tf.convert_to_tensor(X_coord)
+
     return X_coord
 
 
@@ -278,8 +283,8 @@ def train_model(X_aug_coord, X_val_coord, y_aug, y_cat_val):
     def model_initialize_simple(dim):
         model = Sequential()
         model.add(layers.Masking(input_shape=(FRAMES_PER_VIDEO, dim), mask_value=0))
-        model.add(layers.LSTM(units=256, activation="tanh", return_sequences=True))
-        model.add(layers.LSTM(units=128, activation="tanh"))
+        model.add(layers.LSTM(units=512, activation="tanh", return_sequences=True))
+        model.add(layers.LSTM(units=256, activation="tanh"))
         model.add(layers.Dense(N_CLASSES, activation="softmax"))
 
         return model
@@ -296,7 +301,7 @@ def train_model(X_aug_coord, X_val_coord, y_aug, y_cat_val):
         return model
 
     def model_fit(model, epoch, batch_size):
-        es = EarlyStopping(patience=10, restore_best_weights=True)
+        es = EarlyStopping(patience=30, restore_best_weights=True)
 
         history = model.fit(
             X_aug_coord,

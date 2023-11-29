@@ -10,9 +10,6 @@ from backend.ml_logic.model import mediapipe_video_to_coord, detect_landmarks
 from backend.ml_logic.preprocessor import sample_frames
 from backend.ml_logic.registry import load_model, draw_landmarks
 
-from backend.params import VIDEO_PATH
-
-# from mediapipe.solutions.drawing_utils import mp_drawing
 mp_holistic = mp.solutions.holistic
 
 def get_num_frames(video_path):
@@ -31,85 +28,6 @@ def get_num_frames(video_path):
 
     return num_frames
 
-def detect_landmarks_frame(frame):
-    frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-    with mp_holistic.Holistic(min_detection_confidence=0.2, min_tracking_confidence=0.2, static_image_mode=False) as holistic:
-        results = holistic.process(frame_rgb)
-    return results
-
-# # def draw_(results, frame):
-#     annotated_image = frame.copy()
-
-#     if results.right_hand_landmarks:
-#         mp_drawing.draw_landmarks(
-#             image=annotated_image,
-#             landmark_list=results.right_hand_landmarks,
-#             connections=mp_holistic.HAND_CONNECTIONS)
-#         print("✅ Right hand annotated")
-#     else:
-#         print("❌ Right hand not annotated")
-
-#     if results.left_hand_landmarks:
-#         mp_drawing.draw_landmarks(
-#             image=annotated_image,
-#             landmark_list=results.left_hand_landmarks,
-#             connections=mp_holistic.HAND_CONNECTIONS)
-#         print("✅ Left hand annotated")
-#     else:
-#         print("❌ Left hand not annotated")
-
-
-#     if results.pose_landmarks:
-#         mp_drawing.draw_landmarks(
-#             image=annotated_image,
-#             landmark_list=results.pose_landmarks,
-#             connections=mp_holistic.POSE_CONNECTIONS)
-#         print("✅ Pose annotated")
-#     else:
-#         print("❌ Pose not annotated")
-
-#     return annotated_image
-
-# def annotate_video(frames, video_path, temp_video_path):
-
-#     for frame in frames:
-#         cap = cv2.VideoCapture(video_path)
-
-#         frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-#         frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-#         fps = int(cap.get(cv2.CAP_PROP_FPS))
-
-#         # Define the codec and create VideoWriter object
-#         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-#         out = cv2.VideoWriter(filename=temp_video_path, fourcc=fourcc, fps=20, frameSize=(frame_width, frame_height))
-
-#         if not out.isOpened():
-#             print("Could not open output video file for writing.")
-
-#         while cap.isOpened():
-#             print("------")
-#             ret, frame = cap.read()
-#             if not ret:
-#                 break
-
-#             # Process the frame for landmark detection
-#             results = detect_landmarks_frame(frame)
-
-#             # Draw landmarks on the frame
-#             annotated_image = draw_(results, frame)
-
-#             # Write the frame with annotations to the output video
-#             out.write(annotated_image)
-
-#             # cv2.imshow('Video', annotated_image)
-#             if cv2.waitKey(1) & 0xFF == ord('q'):
-#                 break
-
-#         cap.release()
-#         out.release()
-#         cv2.destroyAllWindows()
-
-#         return temp_video_path
 
 def preprocess_video(uploaded_file):
     '''
@@ -156,6 +74,7 @@ def video_uploading_page():
     It displays buttons and allow the user to select words and calls the necessary functions
     to make a prediction after importing a model
     '''
+    model = load_model()
 
     st.title("Sign detection")
     banner_image = "sign_banner.jpg"
@@ -166,27 +85,25 @@ def video_uploading_page():
     </div>
     """, unsafe_allow_html=True)
 
-    classes = ['Select a sign', 'beer','bye','drink','go','hello','love','many','no','thank you','what','work','world','yes','you']
-
+    classes = ['Select a sign','beer','bye','drink','go','hello','love','many','no','thank you','what','work','world','yes','you']
     video_urls = {
-        'beer': [f'{VIDEO_PATH}05707.mp4', f'{VIDEO_PATH}05708.mp4'],
-        'bye': [f'{VIDEO_PATH}08512.mp4', f'{VIDEO_PATH}08517.mp4'],
-        'drink': [f'{VIDEO_PATH}69302.mp4', f'{VIDEO_PATH}65539.mp4'],
-        'go': [f'{VIDEO_PATH}24946.mp4', f'{VIDEO_PATH}24941.mp4'],
-        'hello': [f'{VIDEO_PATH}27184.mp4', f'{VIDEO_PATH}27172.mp4'],
-        'love': [f'{VIDEO_PATH}34123.mp4', f'{VIDEO_PATH}34124.mp4'],
-        'many': [f'{VIDEO_PATH}69396.mp4', f'{VIDEO_PATH}34824.mp4'],
-        'no': [f'{VIDEO_PATH}69411.mp4', f'{VIDEO_PATH}38525.mp4'],
-        'thank you': [f'{VIDEO_PATH}69502.mp4', f'{VIDEO_PATH}66598.mp4'],
-        'what': [f'{VIDEO_PATH}69531.mp4', f'{VIDEO_PATH}62968.mp4'],
-        'work': [f'{VIDEO_PATH}63790.mp4', f'{VIDEO_PATH}63789.mp4'],
-        'world': [f'{VIDEO_PATH}63836.mp4', f'{VIDEO_PATH}63837.mp4'],
-        'yes': [f'{VIDEO_PATH}69546.mp4', f'{VIDEO_PATH}64287.mp4'],
-        'you': [f'{VIDEO_PATH}69547.mp4', f'{VIDEO_PATH}64385.mp4']
+        'beer': ['./videos_demo/05707.mp4', './videos_demo/}05708.mp4'],
+        'bye': ['./videos_demo/08512.mp4', './videos_demo/08517.mp4'],
+        'drink': ['./videos_demo/69302.mp4', './videos_demo/65539.mp4'],
+        'go': ['./videos_demo/24946.mp4', './videos_demo/24941.mp4'],
+        'hello': ['./videos_demo/27184.mp4', './videos_demo/27172.mp4'],
+        'love': ['./videos_demo/34123.mp4', './videos_demo/34124.mp4'],
+        'many': ['./videos_demo/69396.mp4', './videos_demo/34824.mp4'],
+        'no': ['./videos_demo/69411.mp4', './videos_demo/38525.mp4'],
+        'thank you': ['./videos_demo/69502.mp4', './videos_demo/66598.mp4'],
+        'what': ['./videos_demo/69531.mp4', './videos_demo/62968.mp4'],
+        'work': ['./videos_demo/63790.mp4', './videos_demo/63789.mp4'],
+        'world': ['./videos_demo/63836.mp4', './videos_demo/63837.mp4'],
+        'yes': ['./videos_demo/69546.mp4', './videos_demo/64287.mp4'],
+        'you': ['./videos_demo/69547.mp4', './videos_demo/64385.mp4']
     }
 
     chosen_word = st.selectbox("Choose a word:",classes, index = 0, label_visibility = 'collapsed')
-    model = load_model()
 
     # if st.button("Show videos"):
     if chosen_word in video_urls:
@@ -225,10 +142,6 @@ def video_uploading_page():
         """, unsafe_allow_html=True)
 
         st.write(f'Confidence : {max_probability}')
-
-    # if st.button("Draw landmarks"):
-    #     video = annotate_video()
-
 
 def video_streaming_page():
     '''

@@ -23,6 +23,8 @@ from backend.ml_logic.model import mediapipe_video_to_coord, detect_landmarks
 from backend.ml_logic.preprocessor import sample_frames
 from backend.ml_logic.registry import load_model, draw_landmarks
 
+st.set_page_config(page_title='SignFlow', page_icon='👋', layout="centered", initial_sidebar_state="auto", menu_items=None)
+
 # Cach the LSTM model
 @st.cache_resource
 def preload_model():
@@ -94,14 +96,9 @@ def display_videos_for_word(chosen_word, video_urls):
         st.video(video_urls[chosen_word][1])
 
 def video_uploading_page():
-    st.markdown("""
-    <div style="display: flex; justify-content: center; align-items: center;">
-        <h1>Sign Flow</h1>
-    </div>
-    """, unsafe_allow_html=True)
-    banner_image = os.path.join(file_path, 'sign_banner.jpg')
+    banner_image = os.path.join(file_path, 'SignFlowLogo.png')
+    st.image(banner_image, use_column_width=True, width=100)
 
-    st.image(banner_image, use_column_width=True)
     st.markdown("""
     <div style="display: flex; justify-content: center; align-items: center;">
         <h2>Select a word and learn its sign!</h2>
@@ -111,6 +108,7 @@ def video_uploading_page():
     classes = ['Select a sign','beer','bye','drink','go','hello',
                'love','many','no','thank you','what','work','world',
                'yes','you']
+
     video_urls = {
         'beer': [os.path.join(file_path,'videos_demo','05707.mp4'),
                  os.path.join(file_path,'videos_demo','05708.mp4')],
@@ -157,8 +155,7 @@ def video_uploading_page():
         X_coord = preprocess_video(uploaded_file)
 
         if model is not None:
-            st.write('🛠️ AI at work... 🦾')
-            st.write('✅ Sign detected')
+            st.write('**Prediction of the sign :ok_hand: :wave: :+1: :open_hands: ...**')
         else:
             st.write('Failed to load the model')
 
@@ -166,7 +163,6 @@ def video_uploading_page():
         prediction.columns = ['I','beer','bye','drink','go','hello',
                               'love','many','no','thank you','what',
                               'work','world','yes','you']
-        st.write('**Prediction of the sign :ok_hand: :wave: :+1: :open_hands: ...**')
 
         max_probability_word = prediction.idxmax(axis=1).iloc[0]
         max_probability = prediction[max_probability_word].iloc[0]
@@ -203,6 +199,15 @@ def process_frames(frames):
     result_queue.put(word_detected)
 
 def video_streaming_page():
+    banner_image = os.path.join(file_path, 'SignFlowLogo.png')
+    st.image(banner_image, use_column_width=True, width=100)
+
+    st.markdown("""
+    <div style="display: flex; justify-content: center; align-items: center;">
+        <h2>Translate signs in real time!</h2>
+    </div>
+    """, unsafe_allow_html=True)
+
     def video_frame_callback(frame):
         global pred_accumulator
         global pause_accumulator
@@ -237,7 +242,7 @@ def video_streaming_page():
 
     ctx = webrtc_streamer(key="example",
                     video_frame_callback=video_frame_callback,
-                    rtc_configuration={"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]},
+                    #rtc_configuration={"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]},
                     media_stream_constraints={"video": True, "audio": False},
                     async_processing=True)
 
@@ -261,17 +266,14 @@ def video_streaming_page():
 ##################################### Main #####################################
 
 def main():
-
-    st.sidebar.title("SignFlow")
+    st.sidebar.title("Page selector")
     pages = ["Sign Detection: Upload Video", "Sign Detection: Real Time"]
-    choice = st.sidebar.selectbox("Page selector:", pages)
+    choice = st.sidebar.selectbox("Page selector:", pages, label_visibility='collapsed')
 
     if choice == "Sign Detection: Upload Video":
         video_uploading_page()
     elif choice == "Sign Detection: Real Time":
         video_streaming_page()
-
-
 
 if __name__ == "__main__":
     main()

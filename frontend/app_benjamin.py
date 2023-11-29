@@ -6,6 +6,7 @@ import mediapipe as mp
 import os
 import sys
 import pandas as pd
+import tempfile
 
 root_path = os.path.join(
     os.path.dirname(__file__),
@@ -15,11 +16,13 @@ sys.path.append(root_path)
 
 file_path = os.path.dirname(os.path.abspath(__file__))
 
-from backend.ml_logic.model import mediapipe_video_to_coord
+from backend.ml_logic.model import mediapipe_video_to_coord, detect_landmarks
 from backend.ml_logic.preprocessor import sample_frames
-from backend.ml_logic.registry import load_model
+from backend.ml_logic.registry import load_model, draw_landmarks
 
 mp_holistic = mp.solutions.holistic
+mp_drawing = mp.solutions.drawing_utils
+mp_drawing_styles = mp.solutions.drawing_styles
 
 def get_num_frames(video_path):
     '''
@@ -36,7 +39,6 @@ def get_num_frames(video_path):
     cap.release()
 
     return num_frames
-
 
 def preprocess_video(uploaded_file):
     '''
@@ -76,6 +78,70 @@ def display_videos_for_word(chosen_word, video_urls):
         st.video(video_urls[chosen_word][0])
     with col2:
         st.video(video_urls[chosen_word][1])
+
+def show_annotated_video(uploaded_file):
+        temp_video_path = os.path.join(tempfile.gettempdir(), "temp_video.mp4")
+        with open(temp_video_path, "wb") as temp_file:
+            temp_file.write(uploaded_file.read())
+
+        temp_dir = tempfile.TemporaryDirectory()
+        output_video_path = os.path.join(temp_dir.name, "video.mp4")
+
+        cap = cv2.VideoCapture(temp_video_path)
+
+        frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+        frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        fps = int(cap.get(cv2.CAP_PROP_FPS))
+
+        fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+        out = cv2.VideoWriter(filename=output_video_path, fourcc=fourcc, fps=fps, frameSize=(frame_width, frame_height))
+
+        while cap.isOpened():
+            ret, frame_video = cap.read()
+            if not ret:
+                break
+            # Process the frame for landmark detection
+            results_video = detect_landmarks(frame_video)
+
+            # Draw landmarks on the frame
+            annotated_image = draw_landmarks(results_video, frame_video)
+
+            # Write the frame with annotations to the output video
+            out.write(annotated_image)
+
+
+        cap.release()
+        out.release()
+        cv2.destroyAllWindows()
+
+        st.video(output_video_path)
+        temp_dir.cleanup()
+
+def show_annotated_frame(uploaded_file):
+    temp_video_path = os.path.join(tempfile.gettempdir(), "temp_video.mp4")
+    with open(temp_video_path, "wb") as temp_file:
+            temp_file.write(uploaded_file.read())
+
+    num_frames = get_num_frames(temp_video_path)
+    frames = sample_frames(temp_video_path, num_frames)
+    X= np.array(frames)
+    # X shape is (20, 512, 512, 3)
+
+    sampled_frames = (5,10,15)
+    annotated_frame = []
+    for i in sampled_frames:
+        results = detect_landmarks(X[i])
+        image = draw_landmarks(results, X[i])
+        annotated_frame.append(image)
+
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        st.image(annotated_frame[0])
+    with col2:
+        st.image(annotated_frame[1])
+    with col3:
+        st.image(annotated_frame[2])
 
 def video_uploading_page():
     '''
@@ -118,40 +184,45 @@ def video_uploading_page():
     # if st.button("Show videos"):
     if chosen_word in video_urls:
         display_videos_for_word(chosen_word, video_urls)
-        # video_url = video_urls[chosen_word]
-        # st.video(video_url)
 
-    st.write("Upload a video file:")
     uploaded_file = st.file_uploader("Choose a video file", type=["mp4", "avi", "mov"])
     if uploaded_file is not None:
         st.video(uploaded_file)
 
     if st.button("What is this sign?"):
-        X_coord = preprocess_video(uploaded_file)
+        if uploaded_file is not None:
+            X_coord = preprocess_video(uploaded_file)
 
-        if model is not None:
-            st.write('**Model running**')
-            st.write('**✅ Sign detected**')
+            if model is not None:
+                st.write('**🛠️ AI at work... 🦾**')
+            else:
+                st.write('Failed to load the model')
+
+            prediction = pd.DataFrame(model.predict(X_coord))
+            prediction.columns = ['I','beer','bye','drink','go','hello','love','many','no','thank you','what','work','world','yes','you']
+            st.write('**Prediction of the sign :ok_hand: :wave: :+1: :open_hands: ...**')
+
+            max_probability_word = prediction.idxmax(axis=1).iloc[0]
+            max_probability = prediction[max_probability_word].iloc[0]
+
+            max_probability_word = max_probability_word.capitalize()
+            max_probability = round(float(max_probability), 2)
+
+            st.markdown(f"""
+            <div style="display: flex; justify-content: center; align-items: center;">
+                <h2 style="font-size: 2em;">{max_probability_word}</h2>
+            </div>
+            """, unsafe_allow_html=True)
+
+            # st.write(f'Confidence : {max_probability}')
         else:
-            st.write('Failed to load the model')
+            st.write("Please upload a video file...")
 
-        prediction = pd.DataFrame(model.predict(X_coord))
-        prediction.columns = ['I','beer','bye','drink','go','hello','love','many','no','thank you','what','work','world','yes','you']
-        st.write('**Prediction of the sign :ok_hand: :wave: :+1: :open_hands: ...**')
-
-        max_probability_word = prediction.idxmax(axis=1).iloc[0]
-        max_probability = prediction[max_probability_word].iloc[0]
-
-        max_probability_word = max_probability_word.capitalize()
-        max_probability = round(float(max_probability), 2)
-
-        st.markdown(f"""
-        <div style="display: flex; justify-content: center; align-items: center;">
-            <h2 style="font-size: 2em;">{max_probability_word}</h2>
-        </div>
-        """, unsafe_allow_html=True)
-
-        st.write(f'Confidence : {max_probability}')
+    #  if st.button("Coordinates extraction to detect the sign"):
+    #     if uploaded_file is not None:
+    #         show_annotated_frame(uploaded_file)
+    #     else:
+    #         st.write("Please upload a video file...")
 
 def video_streaming_page():
     '''

@@ -9,15 +9,22 @@ from streamlit_webrtc import webrtc_streamer
 import av
 import queue
 import time
+import sys
+root_path = os.path.join(
+    os.path.dirname(__file__),
+    "..",
+)
+
+sys.path.append(root_path)
 
 from backend.ml_logic.model import mediapipe_video_to_coord, detect_landmarks
 from backend.ml_logic.preprocessor import sample_frames
 from backend.ml_logic.registry import load_model, draw_landmarks
 from backend.params import VIDEO_PATH
 
-# model = load_model()
 
 
+model = load_model()
 
 frame_accumulator = []
 # lock = threading.Lock()
@@ -49,8 +56,9 @@ def frames_to_predicton(frames):
     frames_resized = np.array(frames_resized)
     frames_resized = np.expand_dims(frames_resized, axis=0)
     X_coord = mediapipe_video_to_coord(frames_resized)
-    # prediction = model.predict(X_coord)[0]
-    prediction = st.session_state.model.predict(X_coord)[0]
+    print("test")
+    prediction = model.predict(X_coord)[0]
+    # prediction = st.session_state.model.predict(X_coord)[0]
     if np.max(prediction) > 0.4:
         max_index = np.argmax(prediction)
         word_detected = mapping[max_index]
@@ -104,16 +112,21 @@ def video_frame_callback(frame):
 #     st.title("Live Sign Detection")
 ##########################
 
+# @st.cache_resource
+# def model():
+#     model = load_model()
+#     return model
 
 
 def main():
     st.sidebar.title("Pages")
 
-    if 'model' not in st.session_state:
-        st.session_state.model = load_model()
-        # st.write("MODEL LOADING")
+    # if 'model' not in st.session_state:
+    #     st.session_state.model = load_model()
+    #     print(type(st.session_state.model))
+    #     # st.write("MODEL LOADING")
 
-    ctx = webrtc_streamer(key="example", video_frame_callback=video_frame_callback)
+    ctx = webrtc_streamer(key="example", video_frame_callback=video_frame_callback, async_processing=True)
 
     if ctx.state.playing:
         # return recording frame %
@@ -134,7 +147,7 @@ def main():
 
             if frame_count == 100:
                 # return a string of predictions
-                frame_counter_placeholder.text("📽️ Recording... 100% → 🛠️ AI at work... 🦾")
+                frame_counter_placeholder.text("📽️ Recording Done!  🛠️ AI at work... 🦾")
                 result += result_queue.get() + " → "
                 prediction_placeholder.markdown(f"<h1>{result}</h1>", unsafe_allow_html=True)
 

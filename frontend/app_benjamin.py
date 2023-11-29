@@ -4,11 +4,18 @@ import tempfile
 import numpy as np
 import mediapipe as mp
 import os
+import sys
 import pandas as pd
 
-from backend.ml_logic.model import mediapipe_video_to_coord, detect_landmarks
+root_path = os.path.join(
+    os.path.dirname(__file__),
+    "..",
+)
+sys.path.append(root_path)
+
+from backend.ml_logic.model import mediapipe_video_to_coord
 from backend.ml_logic.preprocessor import sample_frames
-from backend.ml_logic.registry import load_model, draw_landmarks
+from backend.ml_logic.registry import load_model
 
 mp_holistic = mp.solutions.holistic
 

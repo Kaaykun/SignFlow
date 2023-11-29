@@ -9,6 +9,13 @@ from streamlit_webrtc import webrtc_streamer
 import av
 import queue
 import time
+import sys
+
+root_path = os.path.join(
+    os.path.dirname(__file__),
+    "..",
+)
+sys.path.append(root_path)
 
 from backend.ml_logic.model import mediapipe_video_to_coord, detect_landmarks
 from backend.ml_logic.preprocessor import sample_frames

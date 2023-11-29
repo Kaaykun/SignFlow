@@ -86,33 +86,28 @@ def draw_landmarks(results, frame):
     mp_drawing = mp.solutions.drawing_utils # type: ignore
     annotated_image = frame.copy()
 
-    if results.right_hand_landmarks:
-        mp_drawing.draw_landmarks(
-            image=annotated_image,
-            landmark_list=results.right_hand_landmarks,
-            connections=mp_holistic.HAND_CONNECTIONS)
-        print("✅ Right hand annotated")
-    else:
-        print("❌ Right hand not annotated")
+    mp_drawing.draw_landmarks(annotated_image,
+                                results.right_hand_landmarks,
+                                mp_holistic.HAND_CONNECTIONS,
+                                mp_drawing.DrawingSpec(color=(80,22,10), thickness=2, circle_radius=4),
+                                mp_drawing.DrawingSpec(color=(80,44,121), thickness=2, circle_radius=2)
+                                )
 
-    if results.left_hand_landmarks:
-        mp_drawing.draw_landmarks(
-            image=annotated_image,
-            landmark_list=results.left_hand_landmarks,
-            connections=mp_holistic.HAND_CONNECTIONS)
-        print("✅ Left hand annotated")
-    else:
-        print("❌ Left hand not annotated")
+    # 3. Left Hand
+    mp_drawing.draw_landmarks(annotated_image,
+                                results.left_hand_landmarks,
+                                mp_holistic.HAND_CONNECTIONS,
+                                mp_drawing.DrawingSpec(color=(121,22,76), thickness=2, circle_radius=4),
+                                mp_drawing.DrawingSpec(color=(121,44,250), thickness=2, circle_radius=2)
+                                )
 
-
-    if results.pose_landmarks:
-        mp_drawing.draw_landmarks(
-            image=annotated_image,
-            landmark_list=results.pose_landmarks,
-            connections=mp_holistic.POSE_CONNECTIONS)
-        print("✅ Pose annotated")
-    else:
-        print("❌ Pose not annotated")
+    # 4. Pose Detections
+    mp_drawing.draw_landmarks(annotated_image,
+                                results.pose_landmarks,
+                                mp_holistic.POSE_CONNECTIONS,
+                                mp_drawing.DrawingSpec(color=(245,117,66), thickness=2, circle_radius=4),
+                                mp_drawing.DrawingSpec(color=(245,66,230), thickness=2, circle_radius=2)
+                                )
 
     return annotated_image
 
@@ -157,7 +152,7 @@ def load_model():
 
     latest_model = keras.models.load_model(most_recent_model_path_on_disk)
 
-    print("✅ Model loaded from local disk")
+    print(f"✅ Model loaded from local disk {most_recent_model_path_on_disk}")
 
     return latest_model
 

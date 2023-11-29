@@ -107,13 +107,10 @@ def video_frame_callback(frame):
 
 
 def main():
-    st.sidebar.title("Pages")
-    start = time.time()
-    ctx = None
-    ctx = webrtc_streamer(key="example", video_frame_callback=video_frame_callback)
-    if ctx != None and (time.time() - start) > 8:
-        print('running')
-        start = time.time()
+    ctx = webrtc_streamer(key="example",
+                          video_frame_callback=video_frame_callback,
+                          rtc_configuration={"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]},
+                          media_stream_constraints={"video": True, "audio": False})
 
     if ctx.state.playing:
         result = ""
@@ -122,9 +119,6 @@ def main():
             time.sleep(0.5)
             result += result_queue.get() + " → "
             prediction_placeholder.write(result)
-
-
-
 
 
     # if "prediction" not in st.session_state:

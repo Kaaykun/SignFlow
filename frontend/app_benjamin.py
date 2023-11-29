@@ -84,7 +84,7 @@ def video_uploading_page():
     model = load_model()
 
     st.title("Sign detection")
-    banner_image = "sign_banner.jpg"
+    banner_image = "./sign_banner.jpg"
     st.image(banner_image, use_column_width=True)
     st.markdown("""
     <div style="display: flex; justify-content: center; align-items: center;">

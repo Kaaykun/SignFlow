@@ -12,7 +12,7 @@ from backend.ml_logic.registry import load_model, draw_landmarks
 
 from backend.params import VIDEO_PATH
 
-from mediapipe.solutions.drawing_utils import mp_drawing
+# from mediapipe.solutions.drawing_utils import mp_drawing
 mp_holistic = mp.solutions.holistic
 
 def get_num_frames(video_path):
@@ -37,79 +37,79 @@ def detect_landmarks_frame(frame):
         results = holistic.process(frame_rgb)
     return results
 
-def draw_(results, frame):
-    annotated_image = frame.copy()
+# # def draw_(results, frame):
+#     annotated_image = frame.copy()
 
-    if results.right_hand_landmarks:
-        mp_drawing.draw_landmarks(
-            image=annotated_image,
-            landmark_list=results.right_hand_landmarks,
-            connections=mp_holistic.HAND_CONNECTIONS)
-        print("✅ Right hand annotated")
-    else:
-        print("❌ Right hand not annotated")
+#     if results.right_hand_landmarks:
+#         mp_drawing.draw_landmarks(
+#             image=annotated_image,
+#             landmark_list=results.right_hand_landmarks,
+#             connections=mp_holistic.HAND_CONNECTIONS)
+#         print("✅ Right hand annotated")
+#     else:
+#         print("❌ Right hand not annotated")
 
-    if results.left_hand_landmarks:
-        mp_drawing.draw_landmarks(
-            image=annotated_image,
-            landmark_list=results.left_hand_landmarks,
-            connections=mp_holistic.HAND_CONNECTIONS)
-        print("✅ Left hand annotated")
-    else:
-        print("❌ Left hand not annotated")
+#     if results.left_hand_landmarks:
+#         mp_drawing.draw_landmarks(
+#             image=annotated_image,
+#             landmark_list=results.left_hand_landmarks,
+#             connections=mp_holistic.HAND_CONNECTIONS)
+#         print("✅ Left hand annotated")
+#     else:
+#         print("❌ Left hand not annotated")
 
 
-    if results.pose_landmarks:
-        mp_drawing.draw_landmarks(
-            image=annotated_image,
-            landmark_list=results.pose_landmarks,
-            connections=mp_holistic.POSE_CONNECTIONS)
-        print("✅ Pose annotated")
-    else:
-        print("❌ Pose not annotated")
+#     if results.pose_landmarks:
+#         mp_drawing.draw_landmarks(
+#             image=annotated_image,
+#             landmark_list=results.pose_landmarks,
+#             connections=mp_holistic.POSE_CONNECTIONS)
+#         print("✅ Pose annotated")
+#     else:
+#         print("❌ Pose not annotated")
 
-    return annotated_image
+#     return annotated_image
 
-def annotate_video(frames, video_path, temp_video_path):
+# def annotate_video(frames, video_path, temp_video_path):
 
-    for frame in frames:
-        cap = cv2.VideoCapture(video_path)
+#     for frame in frames:
+#         cap = cv2.VideoCapture(video_path)
 
-        frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-        frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-        fps = int(cap.get(cv2.CAP_PROP_FPS))
+#         frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+#         frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+#         fps = int(cap.get(cv2.CAP_PROP_FPS))
 
-        # Define the codec and create VideoWriter object
-        fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-        out = cv2.VideoWriter(filename=temp_video_path, fourcc=fourcc, fps=20, frameSize=(frame_width, frame_height))
+#         # Define the codec and create VideoWriter object
+#         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+#         out = cv2.VideoWriter(filename=temp_video_path, fourcc=fourcc, fps=20, frameSize=(frame_width, frame_height))
 
-        if not out.isOpened():
-            print("Could not open output video file for writing.")
+#         if not out.isOpened():
+#             print("Could not open output video file for writing.")
 
-        while cap.isOpened():
-            print("------")
-            ret, frame = cap.read()
-            if not ret:
-                break
+#         while cap.isOpened():
+#             print("------")
+#             ret, frame = cap.read()
+#             if not ret:
+#                 break
 
-            # Process the frame for landmark detection
-            results = detect_landmarks_frame(frame)
+#             # Process the frame for landmark detection
+#             results = detect_landmarks_frame(frame)
 
-            # Draw landmarks on the frame
-            annotated_image = draw_(results, frame)
+#             # Draw landmarks on the frame
+#             annotated_image = draw_(results, frame)
 
-            # Write the frame with annotations to the output video
-            out.write(annotated_image)
+#             # Write the frame with annotations to the output video
+#             out.write(annotated_image)
 
-            # cv2.imshow('Video', annotated_image)
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
+#             # cv2.imshow('Video', annotated_image)
+#             if cv2.waitKey(1) & 0xFF == ord('q'):
+#                 break
 
-        cap.release()
-        out.release()
-        cv2.destroyAllWindows()
+#         cap.release()
+#         out.release()
+#         cv2.destroyAllWindows()
 
-        return temp_video_path
+#         return temp_video_path
 
 def preprocess_video(uploaded_file):
     '''
@@ -186,7 +186,7 @@ def video_uploading_page():
     }
 
     chosen_word = st.selectbox("Choose a word:",classes, index = 0, label_visibility = 'collapsed')
-
+    model = load_model()
 
     # if st.button("Show videos"):
     if chosen_word in video_urls:
@@ -201,7 +201,6 @@ def video_uploading_page():
 
     if st.button("What is this sign?"):
         X_coord = preprocess_video(uploaded_file)
-        model = load_model()
 
         if model is not None:
             st.write('**Model running**')
@@ -227,8 +226,8 @@ def video_uploading_page():
 
         st.write(f'Confidence : {max_probability}')
 
-    if st.button("Draw landmarks"):
-        video = annotate_video()
+    # if st.button("Draw landmarks"):
+    #     video = annotate_video()
 
 
 def video_streaming_page():

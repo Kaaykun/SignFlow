@@ -1,5 +1,6 @@
 numpy==1.23.5
 opencv-python
+opencv-contrib-python
 streamlit
 streamlit-webrtc
 mediapipe

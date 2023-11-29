@@ -68,13 +68,18 @@ def frames_to_predicton(frames):
     print(word_detected)
     return word_detected
 
+start_time = None
 
 def video_frame_callback(frame):
+    global start_time
     #annotate the frame
     frame = frame.to_ndarray(format="bgr24")
     results = detect_landmarks(frame)
     annotated_image = draw_landmarks(results, frame)
     print(frame.shape)
+
+    if start_time is None:
+        start_time = time.time()
 
     # Accumulate frames for 2 seconds (20 frames)
     global frame_accumulator
@@ -82,6 +87,8 @@ def video_frame_callback(frame):
     if len(frame_accumulator) == 20:
         print("------------- AI running.... -------------")
         # print(np.array(frame_accumulator).shape)
+        elapsed_time = time.time() - start_time
+        print(f"Time taken to collect 20 frames: {elapsed_time} seconds")
 
         word_detected = frames_to_predicton(frame_accumulator)
         print(word_detected)
@@ -90,6 +97,7 @@ def video_frame_callback(frame):
         result_queue.put(word_detected)
 
         frame_accumulator = []
+        start_time = None
 
         # with lock:
         #     prediction_list.append(word_detected)

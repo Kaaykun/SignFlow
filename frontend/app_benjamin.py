@@ -87,7 +87,7 @@ def video_uploading_page():
 
     st.title("Sign detection")
     banner_image = os.path.join(file_path, 'sign_banner.jpg')
-    os.path.join(file_path, 'videos_demo' ,'05707.mp4' )
+
     st.image(banner_image, use_column_width=True)
     st.markdown("""
     <div style="display: flex; justify-content: center; align-items: center;">
@@ -98,19 +98,19 @@ def video_uploading_page():
     classes = ['Select a sign','beer','bye','drink','go','hello','love','many','no','thank you','what','work','world','yes','you']
     video_urls = {
         'beer': [os.path.join(file_path,'videos_demo','05707.mp4'), os.path.join(file_path,'videos_demo','05708.mp4')],
-        'bye': ['./videos_demo/08512.mp4', './videos_demo/08517.mp4'],
-        'drink': ['./videos_demo/69302.mp4', './videos_demo/65539.mp4'],
-        'go': ['./videos_demo/24946.mp4', './videos_demo/24941.mp4'],
-        'hello': ['./videos_demo/27184.mp4', './videos_demo/27172.mp4'],
-        'love': ['./videos_demo/34123.mp4', './videos_demo/34124.mp4'],
-        'many': ['./videos_demo/69396.mp4', './videos_demo/34824.mp4'],
-        'no': ['./videos_demo/69411.mp4', './videos_demo/38525.mp4'],
-        'thank you': ['./videos_demo/69502.mp4', './videos_demo/66598.mp4'],
-        'what': ['./videos_demo/69531.mp4', './videos_demo/62968.mp4'],
-        'work': ['./videos_demo/63790.mp4', './videos_demo/63789.mp4'],
-        'world': ['./videos_demo/63836.mp4', './videos_demo/63837.mp4'],
-        'yes': ['./videos_demo/69546.mp4', './videos_demo/64287.mp4'],
-        'you': ['./videos_demo/69547.mp4', './videos_demo/64385.mp4']
+        'bye': [os.path.join(file_path,'videos_demo','08512.mp4'), os.path.join(file_path,'videos_demo','08517.mp4')],
+        'drink': [os.path.join(file_path,'videos_demo','69302.mp4'), os.path.join(file_path,'videos_demo','65539.mp4')],
+        'go': [os.path.join(file_path,'videos_demo', '24946.mp4'), os.path.join(file_path,'videos_demo','24941.mp4')],
+        'hello': [os.path.join(file_path,'videos_demo', '27184.mp4'), os.path.join(file_path,'videos_demo', '27172.mp4')],
+        'love': [os.path.join(file_path,'videos_demo','34123.mp4'), os.path.join(file_path,'videos_demo','34124.mp4')],
+        'many': [os.path.join(file_path,'videos_demo','69396.mp4'), os.path.join(file_path,'videos_demo','34824.mp4')],
+        'no': [os.path.join(file_path,'videos_demo','69411.mp4'), os.path.join(file_path,'videos_demo','38525.mp4')],
+        'thank you': [os.path.join(file_path,'videos_demo', '69502.mp4'), os.path.join(file_path,'videos_demo','66598.mp4')],
+        'what': [os.path.join(file_path,'videos_demo','69531.mp4'), os.path.join(file_path,'videos_demo','62968.mp4')],
+        'work': [os.path.join(file_path,'videos_demo','63790.mp4'), os.path.join(file_path,'videos_demo','63789.mp4')],
+        'world': [os.path.join(file_path,'videos_demo', '63836.mp4'), os.path.join(file_path,'videos_demo','63837.mp4')],
+        'yes': [os.path.join(file_path,'videos_demo','69546.mp4'), os.path.join(file_path,'videos_demo','64287.mp4')],
+        'you': [os.path.join(file_path,'videos_demo','69547.mp4'), os.path.join(file_path,'videos_demo','64385.mp4')]
     }
 
     chosen_word = st.selectbox("Choose a word:",classes, index = 0, label_visibility = 'collapsed')

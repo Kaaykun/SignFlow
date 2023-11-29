@@ -87,7 +87,7 @@ def video_uploading_page():
 
     st.title("Sign detection")
     banner_image = os.path.join(file_path, 'sign_banner.jpg')
-    os.path.join(file_path, 'videos_demo' ,'05707.mp4' )
+
     st.image(banner_image, use_column_width=True)
     st.markdown("""
     <div style="display: flex; justify-content: center; align-items: center;">

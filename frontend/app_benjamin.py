@@ -84,8 +84,8 @@ def video_uploading_page():
     model = load_model()
 
     st.title("Sign detection")
-    banner_image = "./sign_banner.jpg"
-    st.image(banner_image, use_column_width=True)
+    # banner_image = "./sign_banner.jpg"
+    # st.image(banner_image, use_column_width=True)
     st.markdown("""
     <div style="display: flex; justify-content: center; align-items: center;">
         <h2>Select a word and learn its sign!</h2>

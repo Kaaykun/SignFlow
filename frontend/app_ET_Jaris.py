@@ -108,10 +108,12 @@ def video_frame_callback(frame):
 
 def main():
     st.sidebar.title("Pages")
+    start = time.time()
     ctx = None
     ctx = webrtc_streamer(key="example", video_frame_callback=video_frame_callback)
-    while ctx != None:
+    while ctx != None and (time.time() - start) > 8:
         print('running')
+        start = time.time()
 
     if ctx.state.playing:
         result = ""

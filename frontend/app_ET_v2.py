@@ -31,7 +31,7 @@ model = load_model()
 #     print(type(st.session_state.model))
 #     # st.write("MODEL LOADING")
 
-pause_threshold = 3
+pause_threshold = 5
 pred_accumulator = []
 pause_accumulator = []
 pause:list[bool] = [False]  # Are we in a pause
@@ -55,14 +55,17 @@ pause:list[bool] = [False]  # Are we in a pause
 #             'what': 10,
 #             'no': 8}
 
-mapping = {'love': 5,
-        'world': 6,
-        'hello': 4,
-        'go': 3,
-        'you': 7,
-        'beer': 1,
-        'I': 0,
-        'drink': 2}
+# mapping = {'love': 5,
+#         'world': 6,
+#         'hello': 4,
+#         'go': 3,
+#         'you': 7,
+#         'beer': 1,
+#         'I': 0,
+#         'drink': 2}
+
+# mapping = {'many': 4, 'world': 5, 'hello': 3, 'go': 2, 'I': 0, 'drink': 1}
+mapping = {'many': 5, 'world': 6, 'hello': 4, 'go': 3, 'beer': 1, 'I': 0, 'drink': 2}
 
 mapping = {v: k for k, v in mapping.items()}
 
@@ -80,7 +83,7 @@ def frames_to_predicton(frames):
     print("test for prediction...")
     prediction = model.predict(X_coord)[0]
     # prediction = st.session_state.model.predict(X_coord)[0]
-    if np.max(prediction) > 0.4:
+    if np.max(prediction) > 0.6:
         max_index = np.argmax(prediction)
         word_detected = mapping[max_index]
     else:

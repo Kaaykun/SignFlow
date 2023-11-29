@@ -111,7 +111,7 @@ def main():
     start = time.time()
     ctx = None
     ctx = webrtc_streamer(key="example", video_frame_callback=video_frame_callback)
-    while ctx != None and (time.time() - start) > 8:
+    if ctx != None and (time.time() - start) > 8:
         print('running')
         start = time.time()
 

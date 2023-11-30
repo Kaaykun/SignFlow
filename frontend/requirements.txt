@@ -1,8 +1,8 @@
 numpy==1.23.5
 opencv-python-headless
-streamlit==1.22.0
-streamlit-webrtc==0.47.1
-mediapipe==0.10.0
+streamlit
+streamlit-webrtc
+mediapipe
 
 # Trick to install the version of Tensorflow depending on your processor: darwin == Mac, ARM == M1
 tensorflow-macos==2.10.0; sys_platform == 'darwin' and 'ARM' in platform_version # Mac M-chips

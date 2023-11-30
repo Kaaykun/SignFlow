@@ -240,6 +240,7 @@ def video_streaming_page():
 
             processing_thread = threading.Thread(target=process_frames, args=(pred_accumulator,))
             processing_thread.start()
+            processing_thread.join()
 
         elif len(pred_accumulator) == 20 and pause[0]:
             pause_accumulator.append(frame)
@@ -257,7 +258,7 @@ def video_streaming_page():
     # WebRTC streaming setup
     ctx = webrtc_streamer(key="example",
                     video_frame_callback=video_frame_callback,
-                    rtc_configuration={"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]},
+                    # rtc_configuration={"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]},
                     media_stream_constraints={"video": True, "audio": False},
                     async_processing=True)
 

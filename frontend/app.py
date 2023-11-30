@@ -46,7 +46,7 @@ model_live = preload_model_live()
 
 file_path = os.path.dirname(os.path.abspath(__file__))
 
-pause_threshold = 5
+pause_threshold = 3
 pred_accumulator = []
 pause_accumulator = []
 pause:list[bool] = [False]

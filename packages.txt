@@ -1,4 +1,4 @@
-libgl1
-libgl1-mesa-dev
+mesa-common-dev
+libegl1-mesa-dev
+libgles2-mesa-dev
 mesa-utils
-freeglut3-dev

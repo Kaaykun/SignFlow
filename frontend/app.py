@@ -6,7 +6,6 @@ import numpy as np
 import threading
 import tempfile
 import queue
-import time
 import cv2
 import os
 import av
@@ -109,7 +108,7 @@ def video_uploading_page():
 
     st.markdown("""
     <div style="display: flex; justify-content: center; align-items: center;">
-        <h2>Select a word and learn its sign!</h2>
+        <h2>Translate and check a sign!</h2>
     </div>
     """, unsafe_allow_html=True)
 
@@ -148,14 +147,15 @@ def video_uploading_page():
                 os.path.join(file_path,'videos_demo','64385.mp4')]
     }
 
-    chosen_word = st.selectbox("Choose a word:",classes, index = 0,
-                               label_visibility = 'collapsed')
-
-    if chosen_word in video_urls:
-        display_videos_for_word(chosen_word, video_urls)
+    st.markdown("""
+    <div style="display: flex; justify-content: left; align-items: left;">
+        <h3>1️⃣ Translate</h3>
+    </div>
+    """, unsafe_allow_html=True)
 
     uploaded_file = st.file_uploader("**Upload a video file:**",
-                                     type=["mp4", "avi", "mov"])
+                                     type=["mp4", "avi", "mov"],
+                                     label_visibility='collapsed')
     if uploaded_file is not None:
         st.video(uploaded_file)
 
@@ -163,7 +163,12 @@ def video_uploading_page():
         X_coord = preprocess_video(uploaded_file)
 
         if model_live is not None:
-            st.write('**Prediction of the sign :ok_hand: :wave: :+1: :open_hands: ...**')
+            # st.write('**Prediction of the sign :ok_hand: :wave: :+1: :open_hands: ...**')
+            st.markdown(f"""
+            <div style="display: flex; justify-content: left; align-items: left;">
+                <h3 style="font-size: 1.5em;">Prediction of the sign 👌 👋 👍 👐 ...</h3>
+            </div>
+            """, unsafe_allow_html=True)
         else:
             st.write('Failed to load the model')
 
@@ -178,9 +183,23 @@ def video_uploading_page():
 
         st.markdown(f"""
         <div style="display: flex; justify-content: center; align-items: center;">
-            <h2 style="font-size: 2em;">{max_probability_word}</h2>
+            <h1 style="font-size: 3em;">{max_probability_word}</h1>
         </div>
         """, unsafe_allow_html=True)
+
+    st.divider()
+
+    st.markdown("""
+    <div style="display: flex; justify-content: left; align-items: left;">
+        <h3>2️⃣ Check</h3>
+    </div>
+    """, unsafe_allow_html=True)
+
+    chosen_word = st.selectbox("Choose a word:",classes, index = 0,
+                               label_visibility = 'collapsed')
+
+    if chosen_word in video_urls:
+        display_videos_for_word(chosen_word, video_urls)
 
 ######################## Logic for video_streaming_page ########################
 

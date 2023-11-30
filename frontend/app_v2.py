@@ -6,7 +6,6 @@ import numpy as np
 import threading
 import tempfile
 import queue
-import time
 import cv2
 import os
 import av

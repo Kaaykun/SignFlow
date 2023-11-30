@@ -209,14 +209,14 @@ def process_frames(frames):
 def video_streaming_page():
     """Function to create the video streaming page"""
     # Streamlit UI configuration
-    banner_image = os.path.join(file_path, 'SignFlowLogo.jpg')
-    st.image(banner_image, use_column_width=True, width=100)
+    #banner_image = os.path.join(file_path, 'SignFlowLogo.jpg')
+    #st.image(banner_image, use_column_width=True, width=100)
 
-    st.markdown("""
-    <div style="display: flex; justify-content: center; align-items: center;">
-        <h2>Translate signs in real time!</h2>
-    </div>
-    """, unsafe_allow_html=True)
+    # st.markdown("""
+    # <div style="display: flex; justify-content: center; align-items: center;">
+    #     <h2>Translate signs in real time!</h2>
+    # </div>
+    # """, unsafe_allow_html=True)
 
     def video_frame_callback(frame):
         """Callback function for processing each video frame"""

@@ -27,10 +27,10 @@ from backend.ml_logic.registry import load_model, draw_landmarks
 st.set_page_config(page_title='SignFlow', page_icon='👋', layout="centered", initial_sidebar_state="auto", menu_items=None)
 
 # Cach the LSTM model 15 classes
-@st.cache_resource
-def preload_model_uploading():
-    model = load_model(target='uploading')
-    return model
+# @st.cache_resource
+# def preload_model_uploading():
+#     model = load_model(target='uploading')
+#     return model
 
 # Cach the LSTM model 7 classes
 @st.cache_resource
@@ -38,8 +38,9 @@ def preload_model_live():
     model = load_model(target='live')
     return model
 
+
 # Global variable initialization
-model_uploading = preload_model_uploading()
+# model_uploading = preload_model_uploading()
 model_live = preload_model_live()
 
 file_path = os.path.dirname(os.path.abspath(__file__))
@@ -160,12 +161,12 @@ def video_uploading_page():
     if st.button("What is this sign?"):
         X_coord = preprocess_video(uploaded_file)
 
-        if model_uploading is not None:
+        if model_live is not None:
             st.write('**Prediction of the sign :ok_hand: :wave: :+1: :open_hands: ...**')
         else:
             st.write('Failed to load the model')
 
-        prediction = pd.DataFrame(model_uploading.predict(X_coord)) #type:ignore
+        prediction = pd.DataFrame(model_live.predict(X_coord)) #type:ignore
         prediction.columns = ['I','beer','bye','drink','go','hello',
                               'love','many','no','thank you','what',
                               'work','world','yes','you']

@@ -131,7 +131,7 @@ def save_model(model):
     return None
 
 
-def load_model():
+def load_model(target='recent'):
     """
     Return a saved model:
     - locally (latest one in alphabetical order)
@@ -141,21 +141,33 @@ def load_model():
     Return None (but do not Raise) if no model is found
 
     """
-    # Get the latest model version name by the timestamp on disk
+    # Get the model directory path
     local_model_directory = os.path.join(LOCAL_REGISTRY_PATH)
     local_model_paths = glob.glob(f"{local_model_directory}/*")
 
-    if not local_model_paths:
-        return None
+    # Default, return latest model
+    if target == 'recent':
+        model_path_on_disk = sorted(local_model_paths)[-1]
+        model = keras.models.load_model(model_path_on_disk)
+        print(f"✅ Model loaded from local disk {model_path_on_disk}")
 
-    most_recent_model_path_on_disk = sorted(local_model_paths)[-1]
+        return model
 
-    latest_model = keras.models.load_model(most_recent_model_path_on_disk)
+    # Return model trained on 15 classes
+    elif target == 'uploading':
+        model_path_on_disk = f'{local_model_directory}' + '/20231127-161013_15classes.h5'
+        model = keras.models.load_model(model_path_on_disk)
+        print(f"✅ Model loaded from local disk {model_path_on_disk}")
 
-    print(f"✅ Model loaded from local disk {most_recent_model_path_on_disk}")
+        return model
 
-    return latest_model
+    # Return model trained on 7 classes
+    elif target == 'live':
+        model_path_on_disk = f'{local_model_directory}' + '/20231129-215834_7classes.h5'
+        model = keras.models.load_model(model_path_on_disk)
+        print(f"✅ Model loaded from local disk {model_path_on_disk}")
 
+        return model
 
 def record_videos(word, name, video_duration, num_videos):
     """

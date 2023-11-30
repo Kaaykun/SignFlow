@@ -1,4 +1,4 @@
-# Import dependencies
+# Importing necessary dependencies
 from streamlit_webrtc import webrtc_streamer
 import streamlit as st
 import pandas as pd
@@ -23,20 +23,28 @@ from backend.ml_logic.model import mediapipe_video_to_coord, detect_landmarks
 from backend.ml_logic.preprocessor import sample_frames
 from backend.ml_logic.registry import load_model, draw_landmarks
 
+# Setting Streamlit page configuration
 st.set_page_config(page_title='SignFlow', page_icon='👋', layout="centered", initial_sidebar_state="auto", menu_items=None)
 
-# Cach the LSTM model
+# Cach the LSTM model 15 classes
 @st.cache_resource
-def preload_model():
-    model = load_model()
+def preload_model_uploading():
+    model = load_model(target='uploading')
+    return model
+
+# Cach the LSTM model 7 classes
+@st.cache_resource
+def preload_model_live():
+    model = load_model(target='live')
     return model
 
 # Global variable initialization
-model = preload_model()
+model_uploading = preload_model_uploading()
+model_live = preload_model_live()
 
 file_path = os.path.dirname(os.path.abspath(__file__))
 
-pause_threshold = 3
+pause_threshold = 5
 pred_accumulator = []
 pause_accumulator = []
 pause:list[bool] = [False]
@@ -44,26 +52,20 @@ pause:list[bool] = [False]
 result_queue: "queue.Queue[List[Detection]]" = queue.Queue() #type:ignore
 second_queue: "queue.Queue[List[Detection]]" = queue.Queue() #type:ignore
 
-mapping = {'bye': 2,
-            'love': 6,
-            'many': 7,
-            'world': 12,
-            'thankyou': 9,
-            'work': 11,
-            'hello': 5,
-            'go': 4,
-            'yes': 13,
-            'you': 14,
-            'beer': 1,
-            'I': 0,
-            'drink': 3,
-            'what': 10,
-            'no': 8}
+mapping = {'I': 0,
+           'beer': 1,
+           'drink': 2,
+           'go': 3,
+           'hello': 4,
+           'many': 5,
+           'world': 6}
+
 mapping = {v: k for k, v in mapping.items()}
 
 ######################## Logic for video_uploading_page ########################
 
 def get_num_frames(video_path):
+    """Get the number of frames in a video file"""
     cap = cv2.VideoCapture(video_path)
     if not cap.isOpened():
         raise ValueError(f"Error opening video file: {video_path}")
@@ -76,6 +78,7 @@ def get_num_frames(video_path):
 
 
 def preprocess_video(uploaded_file):
+    """Preprocess the uploaded video file"""
     temp_video_path = os.path.join(tempfile.gettempdir(), "temp_video.mp4")
     with open(temp_video_path, "wb") as temp_file:
             temp_file.write(uploaded_file.read())
@@ -89,6 +92,7 @@ def preprocess_video(uploaded_file):
     return X_coord
 
 def display_videos_for_word(chosen_word, video_urls):
+    """Display videos associated with a selected word"""
     col1, col2 = st.columns(2)
     with col1:
         st.video(video_urls[chosen_word][0])
@@ -96,6 +100,8 @@ def display_videos_for_word(chosen_word, video_urls):
         st.video(video_urls[chosen_word][1])
 
 def video_uploading_page():
+    """Create the UI for video uploading and processing"""
+    # Streamlit UI configuration
     banner_image = os.path.join(file_path, 'SignFlowLogo.png')
     st.image(banner_image, use_column_width=True, width=100)
 
@@ -154,12 +160,12 @@ def video_uploading_page():
     if st.button("What is this sign?"):
         X_coord = preprocess_video(uploaded_file)
 
-        if model is not None:
+        if model_uploading is not None:
             st.write('**Prediction of the sign :ok_hand: :wave: :+1: :open_hands: ...**')
         else:
             st.write('Failed to load the model')
 
-        prediction = pd.DataFrame(model.predict(X_coord)) #type:ignore
+        prediction = pd.DataFrame(model_uploading.predict(X_coord)) #type:ignore
         prediction.columns = ['I','beer','bye','drink','go','hello',
                               'love','many','no','thank you','what',
                               'work','world','yes','you']
@@ -179,26 +185,30 @@ def video_uploading_page():
 ######################## Logic for video_streaming_page ########################
 
 def frames_to_predicton(frames):
+        """Function to process frames and predict sign based on the frames"""
         frames_resized = [cv2.resize(frame, (480, 480)) for frame in frames]
         frames_resized = np.expand_dims(np.array(frames_resized), axis=0)
         X_coord = mediapipe_video_to_coord(frames_resized)
 
-        prediction = model.predict(X_coord)[0] #type:ignore
+        prediction = model_live.predict(X_coord)[0] #type:ignore
 
-        if np.max(prediction) > 0.4:
+        if np.max(prediction) > 0.6:
             max_index = np.argmax(prediction)
-            word_detected = mapping[max_index]
+            word_detected = mapping[max_index] # Mapping the predicted index to the sign word
         else:
-            word_detected = "..."
+            word_detected = "..." # If prediction confidence is low
 
         return word_detected
 
 def process_frames(frames):
+    """Function to process frames and put the detected word in the result queue"""
     global result_queue
     word_detected = frames_to_predicton(frames)
     result_queue.put(word_detected)
 
 def video_streaming_page():
+    """Function to create the video streaming page"""
+    # Streamlit UI configuration
     banner_image = os.path.join(file_path, 'SignFlowLogo.png')
     st.image(banner_image, use_column_width=True, width=100)
 
@@ -209,9 +219,13 @@ def video_streaming_page():
     """, unsafe_allow_html=True)
 
     def video_frame_callback(frame):
+        """Callback function for processing each video frame"""
         global pred_accumulator
         global pause_accumulator
         global pause
+
+        if len(pred_accumulator) == 0:
+            print("📽️ START")
 
         frame = frame.to_ndarray(format="bgr24")
         results = detect_landmarks(frame)
@@ -240,12 +254,14 @@ def video_streaming_page():
 
         return av.VideoFrame.from_ndarray(annotated_image, format="bgr24")
 
+    # WebRTC streaming setup
     ctx = webrtc_streamer(key="example",
                     video_frame_callback=video_frame_callback,
                     #rtc_configuration={"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]},
                     media_stream_constraints={"video": True, "audio": False},
                     async_processing=True)
 
+    # Continuously update UI based on video processing
     if ctx.state.playing:
         frame_count = 0
         frame_counter_placeholder = st.empty()
@@ -266,6 +282,7 @@ def video_streaming_page():
 ##################################### Main #####################################
 
 def main():
+    """Main function to select and render different pages"""
     st.sidebar.title("Page selector")
     pages = ["Sign Detection: Upload Video", "Sign Detection: Real Time"]
     choice = st.sidebar.selectbox("Page selector:", pages, label_visibility='collapsed')

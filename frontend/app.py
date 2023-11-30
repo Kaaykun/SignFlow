@@ -6,6 +6,7 @@ import numpy as np
 import threading
 import tempfile
 import queue
+import time
 import cv2
 import os
 import av
@@ -103,7 +104,7 @@ def display_videos_for_word(chosen_word, video_urls):
 def video_uploading_page():
     """Create the UI for video uploading and processing"""
     # Streamlit UI configuration
-    banner_image = os.path.join(file_path, 'SignFlowLogo.png')
+    banner_image = os.path.join(file_path, 'SignFlowLogo.jpg')
     st.image(banner_image, use_column_width=True, width=100)
 
     st.markdown("""
@@ -167,9 +168,7 @@ def video_uploading_page():
             st.write('Failed to load the model')
 
         prediction = pd.DataFrame(model_live.predict(X_coord)) #type:ignore
-        prediction.columns = ['I','beer','bye','drink','go','hello',
-                              'love','many','no','thank you','what',
-                              'work','world','yes','you']
+        prediction.columns = ['I', 'beer', 'drink', 'go', 'hello', 'many', 'world']
 
         max_probability_word = prediction.idxmax(axis=1).iloc[0]
         max_probability = prediction[max_probability_word].iloc[0]
@@ -186,20 +185,20 @@ def video_uploading_page():
 ######################## Logic for video_streaming_page ########################
 
 def frames_to_predicton(frames):
-        """Function to process frames and predict sign based on the frames"""
-        frames_resized = [cv2.resize(frame, (480, 480)) for frame in frames]
-        frames_resized = np.expand_dims(np.array(frames_resized), axis=0)
-        X_coord = mediapipe_video_to_coord(frames_resized)
+    """Function to process frames and predict sign based on the frames"""
+    frames_resized = [cv2.resize(frame, (480, 480)) for frame in frames]
+    frames_resized = np.expand_dims(np.array(frames_resized), axis=0)
+    X_coord = mediapipe_video_to_coord(frames_resized)
 
-        prediction = model_live.predict(X_coord)[0] #type:ignore
+    prediction = model_live.predict(X_coord)[0] #type:ignore
 
-        if np.max(prediction) > 0.6:
-            max_index = np.argmax(prediction)
-            word_detected = mapping[max_index] # Mapping the predicted index to the sign word
-        else:
-            word_detected = "..." # If prediction confidence is low
+    if np.max(prediction) > 0.6:
+        max_index = np.argmax(prediction)
+        word_detected = mapping[max_index] # Mapping the predicted index to the sign word
+    else:
+        word_detected = "..." # If prediction confidence is low
 
-        return word_detected
+    return word_detected
 
 def process_frames(frames):
     """Function to process frames and put the detected word in the result queue"""
@@ -210,7 +209,7 @@ def process_frames(frames):
 def video_streaming_page():
     """Function to create the video streaming page"""
     # Streamlit UI configuration
-    banner_image = os.path.join(file_path, 'SignFlowLogo.png')
+    banner_image = os.path.join(file_path, 'SignFlowLogo.jpg')
     st.image(banner_image, use_column_width=True, width=100)
 
     st.markdown("""

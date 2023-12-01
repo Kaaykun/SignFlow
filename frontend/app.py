@@ -160,32 +160,36 @@ def video_uploading_page():
         st.video(uploaded_file)
 
     if st.button("What is this sign?"):
-        X_coord = preprocess_video(uploaded_file)
+        if uploaded_file is None:
+            st.warning('Oops! Please upload a video first.', icon="🚨")
 
-        if model_live is not None:
-            # st.write('**Prediction of the sign :ok_hand: :wave: :+1: :open_hands: ...**')
+        else:
+            X_coord = preprocess_video(uploaded_file)
+
+            if model_live is not None:
+                # st.write('**Prediction of the sign :ok_hand: :wave: :+1: :open_hands: ...**')
+                st.markdown(f"""
+                <div style="display: flex; justify-content: left; align-items: left;">
+                    <h3 style="font-size: 1.5em;">Prediction of the sign 👌 👋 👍 👐 ...</h3>
+                </div>
+                """, unsafe_allow_html=True)
+            else:
+                st.write('Failed to load the model')
+
+            prediction = pd.DataFrame(model_live.predict(X_coord)) #type:ignore
+            prediction.columns = ['I', 'beer', 'drink', 'go', 'hello', 'many', 'world']
+
+            max_probability_word = prediction.idxmax(axis=1).iloc[0]
+            max_probability = prediction[max_probability_word].iloc[0]
+
+            max_probability_word = max_probability_word.capitalize()
+            max_probability = round(float(max_probability), 2)
+
             st.markdown(f"""
-            <div style="display: flex; justify-content: left; align-items: left;">
-                <h3 style="font-size: 1.5em;">Prediction of the sign 👌 👋 👍 👐 ...</h3>
+            <div style="display: flex; justify-content: center; align-items: center;">
+                <h1 style="font-size: 3em;">{max_probability_word}</h1>
             </div>
             """, unsafe_allow_html=True)
-        else:
-            st.write('Failed to load the model')
-
-        prediction = pd.DataFrame(model_live.predict(X_coord)) #type:ignore
-        prediction.columns = ['I', 'beer', 'drink', 'go', 'hello', 'many', 'world']
-
-        max_probability_word = prediction.idxmax(axis=1).iloc[0]
-        max_probability = prediction[max_probability_word].iloc[0]
-
-        max_probability_word = max_probability_word.capitalize()
-        max_probability = round(float(max_probability), 2)
-
-        st.markdown(f"""
-        <div style="display: flex; justify-content: center; align-items: center;">
-            <h1 style="font-size: 3em;">{max_probability_word}</h1>
-        </div>
-        """, unsafe_allow_html=True)
 
     st.divider()
 

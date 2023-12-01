@@ -1,10 +1,11 @@
 # Sign Flow - A Sign Language Detection Application
 
-![SignFlow Logo](../SignFlow/backend/data/SignFlow_Logo.png)
+![SignFlow Logo](../SignFlow/backend/data/SignFlow_Logo.jpg)
 
 This repository contains a sign language detection application built using Python. The application utilizes the Streamlit framework for the user interface, OpenCV for video processing, and TensorFlow/Keras for LSTM-based sign language prediction.
 
 Checkout our app on Streamlit:
+https://signflow.streamlit.app/
 
 ## Table of Contents
 - [Files](#files)
@@ -18,15 +19,20 @@ Checkout our app on Streamlit:
 
 **Dataset**: https://www.kaggle.com/datasets/risangbaskoro/wlasl-processed
 
-1. **preprocessor.py**: Contains functions for sampling frames from videos, creating feature matrices, and generating processed videos.
+1. **preprocessor.py**: 
+   Contains functions for sampling frames from videos, creating feature matrices, and generating processed videos.
 
-2. **registry.py**: Includes functions for generating processed videos, CSV files, drawing landmarks, and saving/loading models.
+2. **registry.py**: 
+   Includes functions for generating processed videos, CSV files, drawing landmarks, and saving/loading models.
 
-3. **model.py**: Defines the LSTM model architecture and functions for training the model.
+3. **model.py**: 
+   Defines the LSTM model architecture and functions for training the model.
 
-4. **main.py**: The main script that orchestrates the data processing, model training, and saving.
+4. **main.py**: 
+   The main script that orchestrates the data processing, model training, and saving.
 
-5. **app.py**: The Streamlit application with two pages - one for uploading a video for sign detection and another for real-time sign detection from a webcam stream.
+5. **app.py**: 
+   The Streamlit application with two pages - one for uploading a video for sign detection and another for real-time sign detection from a webcam stream.
 
 ## Usage
 
@@ -73,3 +79,5 @@ Checkout our app on Streamlit:
    pip install -r requirements.txt
 
 ## License
+This app is not licensed.
+

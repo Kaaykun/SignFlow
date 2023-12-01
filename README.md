@@ -1,6 +1,6 @@
 # Sign Flow - A Sign Language Detection Application
 
-![SignFlow Logo](../SignFlow/frontend/SignFlowLogo.jpg)
+![SignFlow Logo](frontend/SignFlowLogo.jpg)
 
 This repository contains a sign language detection application built using Python. The application utilizes the Streamlit framework for the user interface, OpenCV for video processing, and TensorFlow/Keras for LSTM-based sign language prediction.
 
